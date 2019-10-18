@@ -6,9 +6,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>  Forward | Elan's Data Diary
+  <title>  Chapter 1 - Word Sense Disambiguation.nbdata | Elan's Data Diary
 </title>
-  <link rel="canonical" href="/forward.html">
+  <link rel="canonical" href="/Chapter 1 - Word Sense Disambiguation.nbdata.html">
 
 
   <link rel="stylesheet" href="/theme/css/bootstrap.min.css">
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="/theme/css/theme.css">
 
   
-  <meta name="description" content="The first post and forward for the blog">
+  <meta name="description" content="The first chapter of the first topic">
 
 
 </head>
@@ -38,15 +38,15 @@
 
   <div class="main">
     <div class="container">
-      <h1>  Forward
+      <h1>  Chapter 1 - Word Sense Disambiguation.nbdata
 </h1>
       <hr>
   <article class="article">
     <header>
       <ul class="list-inline">
-        <li class="list-inline-item text-muted" title="2019-06-24T22:54:00-05:00">
+        <li class="list-inline-item text-muted" title="2019-10-17T12:00:00-05:00">
           <i class="fa fa-clock-o"></i>
-          Mon 24 June 2019
+          Thu 17 October 2019
         </li>
         <li class="list-inline-item">
           <i class="fa fa-folder-open-o"></i>
@@ -1213,15 +1213,17 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Forward">Forward<a class="anchor-link" href="#Forward">&#182;</a></h1>
+<h1 id="Word-Sense-Disambiguation---A-Dandilion-by-Any-Other-Name-Would-Reek-Just-as-Candy">Word-Sense Disambiguation - A Dandilion by Any Other Name Would Reek Just as Candy<a class="anchor-link" href="#Word-Sense-Disambiguation---A-Dandilion-by-Any-Other-Name-Would-Reek-Just-as-Candy">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Welcome!</p>
-<p>The purpose of this diary is to chronicle my research in various topics around machine learning. It will contain a mix of experimentation, data exploration, reading and summarizing papers, and replicating state of the art models. I believe that taking a slower more deliberate approach to strudying will prove more effective than simply working on a project or kaggle competition.</p>
+<h2 id="Is-there-an-art-to-replacing-words?">Is there an art to replacing words?<a class="anchor-link" href="#Is-there-an-art-to-replacing-words?">&#182;</a></h2><p>Many topics in Natural Language Processing seem like they would be trivial to solve. Take the case of finding synonyms or antonyms for a word in a sentence. All you have to do is look up the word in a thesaurus and find a suitable replacement. Our dictionaries like Miriam Webster or Oxford are essentially databases. Surely we can just do a lookup, right? That's O(1) complexity! In my example above - "A Dandelion by any other name would reek just as candy" is a play on Shakespeare's words "A rose by any other name would be just as sweet". I've replaced three words manually.</p>
+<p><strong>Rose -&gt; Dandelion</strong>: These are not true synonyms, but they are both flowers. A human might find them to be a suitable replacement, but this is NOT what we want to solve. In fact, this is a replacement that a language model might make since the <strong>sense</strong> of the sentence is preserved.</p>
+<p><strong>Sweet -&gt; Candy</strong>: The word sweet could refer to a cookie or any other sugary confectionery. This is a synonym, but it doesn't preserve the sense of the sentence. The original meaning is describing the taste/smell of sugar. The word <strong>pleasant</strong> would maintain the meaning of the original sentence, but instead we choose the wrong meaning</p>
+<p><strong>Smell -&gt; Reek</strong>: This is a correct synonym change for the sentence, although it does change the connotation of the sentence. The sense of the word is preserved, but reek implies that the smell is bad! In looking at a thesaurus, the word <strong>smack</strong> would be more appropriate, but it's also more colloquial than the simple word <strong>smell</strong>.</p>
 
 </div>
 </div>
@@ -1229,11 +1231,257 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="What-to-expect">What to expect<a class="anchor-link" href="#What-to-expect">&#182;</a></h2><ol>
-<li>I'll attempt to dive deeper into topics when I don't know something. I welcome the rabbit hole</li>
-<li>When possible, I will attempt to prove or disprove assumptions made about data, lanuguage, and science through exploration and experimentation</li>
-<li>This is not a tutorial blog, but a place to organize my thoughts and research in a way that is productive towards learning. I may have entire posts dedicated to experimenting a crazy idea only to realize I'm reinventing the wheel or that it will lead nowhere</li>
+<h2 id="First-Attempt:-Using-a-Dictionary">First Attempt: Using a Dictionary<a class="anchor-link" href="#First-Attempt:-Using-a-Dictionary">&#182;</a></h2><p>The first thought would be to use a dictionary database that supports synonyms. The most famous one is Wordnet:</p>
+<p><em>George A. Miller (1995). WordNet: A Lexical Database for English.
+Communications of the ACM Vol. 38, No. 11: 39-41.</em>
+<em>Princeton University "About WordNet." <a href="https://wordnet.princeton.edu">https://wordnet.princeton.edu</a>. Princeton University. 2010. </em></p>
+<p>This database is provided in the NLTK package. It provides apis to map between words AND senses. It has what is called synsets. These are the list of senses, or meanings that a word could represent. Words that share the same sense are synonyms.</p>
+<p>This makes our algorithm simple:</p>
+<ol>
+<li>Look up the word in the dictionary</li>
+<li>Get all senses of the word</li>
+<li>For the <strong>correct</strong> sense, select all words that share the same sense</li>
 </ol>
+<p>We'll soon see that the 3rd step is going to be much more complicated than assumed and has a whole field of research behind it. Anyways, without further ado:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="1.-Look-up-the-word-in-the-dictionary">1. Look up the word in the dictionary<a class="anchor-link" href="#1.-Look-up-the-word-in-the-dictionary">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="k">import</span> <span class="n">wordnet</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wordnet</span><span class="o">.</span><span class="n">synsets</span><span class="p">(</span><span class="s2">&quot;smell&quot;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[Synset(&#39;smell.n.01&#39;), Synset(&#39;olfactory_property.n.01&#39;), Synset(&#39;spirit.n.02&#39;), Synset(&#39;smell.n.04&#39;), Synset(&#39;smell.n.05&#39;), Synset(&#39;smell.v.01&#39;), Synset(&#39;smell.v.02&#39;), Synset(&#39;smell.v.03&#39;), Synset(&#39;smack.v.02&#39;), Synset(&#39;smell.v.05&#39;)]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>What is this? Did we already finish the second step? This is a list of senses. You might expect that we would get a list of definitions, but the distinction here is that the the definition of a word is tied to it's meaning, and not the word itself. This seems obvious in hindsight. There are multiple meanings for the word. Some of them might be very specific to the word, such that there might not be another word that sames the same sense.</p>
+<p>The senses are names in the format of "sense_name.part_of<em>speech</em>.number". 'smell.n.01' is the first meaning for the noun "smell". Let's get the definition of each of theses:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ol>
+<li>Get all senses of the word</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">smell_senses</span> <span class="o">=</span> <span class="n">wordnet</span><span class="o">.</span><span class="n">synsets</span><span class="p">(</span><span class="s2">&quot;smells&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">sense</span> <span class="ow">in</span> <span class="n">smell_senses</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{sense}</span><span class="s2">: </span><span class="si">{definition}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sense</span><span class="o">=</span><span class="n">sense</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="n">sense</span><span class="o">.</span><span class="n">definition</span><span class="p">()))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Synset(&#39;smell.n.01&#39;): the sensation that results when olfactory receptors in the nose are stimulated by particular chemicals in gaseous form
+Synset(&#39;olfactory_property.n.01&#39;): any property detected by the olfactory system
+Synset(&#39;spirit.n.02&#39;): the general atmosphere of a place or situation and the effect that it has on people
+Synset(&#39;smell.n.04&#39;): the faculty that enables us to distinguish scents
+Synset(&#39;smell.n.05&#39;): the act of perceiving the odor of something
+Synset(&#39;smell.v.01&#39;): inhale the odor of; perceive by the olfactory sense
+Synset(&#39;smell.v.02&#39;): emit an odor
+Synset(&#39;smell.v.03&#39;): smell bad
+Synset(&#39;smack.v.02&#39;): have an element suggestive (of something)
+Synset(&#39;smell.v.05&#39;): become aware of not through the senses but instinctively
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ol>
+<li>For the <strong>correct</strong> sense, select all words that share the same sense</li>
+</ol>
+<p>We now have all of the senses and their definitions, but do we know the correct meaning? 'smell.v.01' looks promising. Let's look at that first.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">words</span> <span class="o">=</span> <span class="n">wordnet</span><span class="o">.</span><span class="n">synset</span><span class="p">(</span><span class="s1">&#39;smell.v.01&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lemmas</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">name</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>smell
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We got back the word we started with! We'll have to try another. Let's just print out all of the synonyms for each sense to be safe</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">sense</span> <span class="ow">in</span> <span class="n">smell_senses</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{sense}</span><span class="s2">: </span><span class="si">{definition}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sense</span><span class="o">=</span><span class="n">sense</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="n">sense</span><span class="o">.</span><span class="n">definition</span><span class="p">()))</span>
+    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sense</span><span class="o">.</span><span class="n">lemmas</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">name</span><span class="p">()))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Synset(&#39;smell.n.01&#39;): the sensation that results when olfactory receptors in the nose are stimulated by particular chemicals in gaseous form
+	smell
+	odor
+	odour
+	olfactory_sensation
+	olfactory_perception
+Synset(&#39;olfactory_property.n.01&#39;): any property detected by the olfactory system
+	olfactory_property
+	smell
+	aroma
+	odor
+	odour
+	scent
+Synset(&#39;spirit.n.02&#39;): the general atmosphere of a place or situation and the effect that it has on people
+	spirit
+	tone
+	feel
+	feeling
+	flavor
+	flavour
+	look
+	smell
+Synset(&#39;smell.n.04&#39;): the faculty that enables us to distinguish scents
+	smell
+	sense_of_smell
+	olfaction
+	olfactory_modality
+Synset(&#39;smell.n.05&#39;): the act of perceiving the odor of something
+	smell
+	smelling
+Synset(&#39;smell.v.01&#39;): inhale the odor of; perceive by the olfactory sense
+	smell
+Synset(&#39;smell.v.02&#39;): emit an odor
+	smell
+Synset(&#39;smell.v.03&#39;): smell bad
+	smell
+Synset(&#39;smack.v.02&#39;): have an element suggestive (of something)
+	smack
+	reek
+	smell
+Synset(&#39;smell.v.05&#39;): become aware of not through the senses but instinctively
+	smell
+	smell_out
+	sense
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It seems like 'smack.v.02' is our most promising result and is equivalent to what I found in the thesaurus (smack and reek). We probably could have avoided most of these by removing the nouns, but how would we have selected the remaining word? <strong>'smack.v.02': have an element suggestive (of something)</strong> is our correct answer, but why not use <strong>'smell.v.02': emit an odor</strong> instead based on the definition? That definition seems more promising.</p>
+<p>My choice of sense was initially based on the definition. Who decides on the exact wording? If I used a different dictionary, I might have come to a different conclusion. Therefore a dictionary-agnostic method is preferred. This is the crux of the matter. The meaning or sense of the word is ambiguous. How should I know which word to use? Is there a way to validate that I selected the correct word?</p>
+<p>This problem is eponymously known as <strong>Word-Sense Disambiguation</strong>. It is hard. But much progress has been made in the past few years in Natural Language Processing. I plan to look at existing research in the field starting with pre machine learning algorithms and build up to state of the art research.</p>
 
 </div>
 </div>
